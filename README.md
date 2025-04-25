@@ -1,4 +1,7 @@
-# TP1WebDesign
+# TPS para desarrollo web
 
-## Participantes
+## Owner
 * Mateo Santarsiero
+
+<br>
+Este repositorio tiene como objetivo el almacenaje y desarrollo de los trabajos practicos y/o evaluaciones que sean propiedad de Mateo Santarsiero
