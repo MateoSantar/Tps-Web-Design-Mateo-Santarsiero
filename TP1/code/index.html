@@ -67,10 +67,11 @@
       
     </div>
     <script>
+        const endpoint = 'https://jsonplaceholder.typicode.com/posts';
         function getPosts() {
             let miPromise = new Promise((resolve, reject) => {
                 let xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://jsonplaceholder.typicode.com/posts");
+                xhr.open("GET", endpoint);
                 xhr.onload = () =>{
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(JSON.parse(xhr.responseText));
@@ -105,7 +106,7 @@
             }
             let miPromise = new Promise((resolve, reject) => {
                 let xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://jsonplaceholder.typicode.com/posts");
+                xhr.open("POST", endpoint);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onload = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
@@ -140,7 +141,7 @@
             }
             let miPromise = new Promise((resolve, reject) => {
                 let xhr = new XMLHttpRequest();
-                xhr.open("PUT", `https://jsonplaceholder.typicode.com/posts/${id}`);
+                xhr.open("PUT", `${endpoint}/${id}`);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onload = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
@@ -152,6 +153,8 @@
                 xhr.onerror = () => {
                     reject("Error: " + xhr.statusText);
                 };
+                console.log(JSON.stringify({ [select]: newValue }));
+                
                 xhr.send(JSON.stringify({ [select]: newValue }));
             });
             miPromise
@@ -178,7 +181,7 @@
             }
             let miPromise = new Promise((resolve, reject) => {
                 let xhr = new XMLHttpRequest();
-                xhr.open("DELETE", `https://jsonplaceholder.typicode.com/posts/${id}`);
+                xhr.open("DELETE", `${endpoint}/${id}`);
                 xhr.onload = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(JSON.parse(xhr.responseText));
