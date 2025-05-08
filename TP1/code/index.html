@@ -1,70 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TP N° 1</title>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 101vh;
             background-color: #f0f0f0;
         }
-    
+
         .buttons-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-    
+
         .button-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-    
+
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
-    
-        input, select {
+
+        input,
+        select {
             padding: 10px;
             font-size: 16px;
         }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+            position: sticky;
+            /* Fija la cabecera en la parte superior */
+            top: 0;
+            /* Asegura que se pegue a la parte superior */
+            z-index: 1;
+            /* Evita que el contenido se superponga a la cabecera */
+        }
+        .tableDiv{
+            display: block;
+            overflow-y: scroll;
+            width: 100%;
+        }
+        tbody {
+            
+            width: 100%;
+            /* Agrega scroll vertical cuando el contenido excede la altura */
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
     </style>
-  </head>
-  <!-- Hecho por Mateo Santarsiero 
+</head>
+<!-- Hecho por Mateo Santarsiero 
        API Utilizada: jsonplaceholder.typicode.com -->
-  <body>
+
+<body>
     <div class="buttons-container">
-      <div class="button-container">
-        <button onclick="getPosts()">Obtener listado de posts</button>
-      </div>
-      <div class="button-container">
-        <button onclick="postPost()">Cargar nuevo post</button>
-        <div class="inputs-container">
-            <input type="text" placeholder="Titulo" id="postTitle"/>
-            <input type="text" placeholder="Cuerpo" id="postBody"/>
+        <div class="button-container">
+            <button onclick="getPosts()">Obtener listado de posts</button>
         </div>
-      </div>
-      <div class="button-container">
-        <button onclick="putPost()">Actualizar post</button>
-        <input type="text" placeholder="ID" id="putId"/>
-        <select id="putSelect">
-            <option value="title">Titulo</option>
-            <option value="body">Cuerpo</option>
-        </select>
-        <input type="text" placeholder="Nuevo valor" id="putNewValue"/>
-      </div>
-      <div class="button-container">
-        <button onclick="deletePost()">Dar de baja un post</button>
-        <input type="text" placeholder="ID" id="deleteId"/>
-      </div>
-      
+        <div class="button-container">
+            <button onclick="postPost()">Cargar nuevo post</button>
+            <div class="inputs-container">
+                <input type="text" placeholder="Titulo" id="postTitle" />
+                <input type="text" placeholder="Cuerpo" id="postBody" />
+            </div>
+        </div>
+        <div class="button-container">
+            <button onclick="putPost()">Actualizar post</button>
+            <input type="text" placeholder="ID" id="putId" />
+            <select id="putSelect">
+                <option value="title">Titulo</option>
+                <option value="body">Cuerpo</option>
+            </select>
+            <input type="text" placeholder="Nuevo valor" id="putNewValue" />
+        </div>
+        <div class="button-container">
+            <button onclick="deletePost()">Dar de baja un post</button>
+            <input type="text" placeholder="ID" id="deleteId" />
+        </div>
+    </div>
+    <div class="tableDiv">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titulo</th>
+                    <th>Cuerpo</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+
+            </tbody>
+        </table>
+
     </div>
     <script>
         const endpoint = 'https://jsonplaceholder.typicode.com/posts';
@@ -72,7 +126,7 @@
             let miPromise = new Promise((resolve, reject) => {
                 let xhr = new XMLHttpRequest();
                 xhr.open("GET", endpoint);
-                xhr.onload = () =>{
+                xhr.onload = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(JSON.parse(xhr.responseText));
                     } else {
@@ -84,12 +138,24 @@
                 };
                 xhr.send();
             });
+
+            const tbody = document.getElementById('tableBody');
             miPromise
                 .then((data) => {
-                    alert("Posts obtenidos con éxito. Revisa la consola.");
+                    alert(`Exito! Posts obtenidos.`);
                     data.forEach((post) => {
-                        console.log(`ID: ${post.id}, Titulo: ${post.title}, Cuerpo: ${post.body}`);
+                        const row = tbody.insertRow();
+                        const idCell = row.insertCell(0);
+                        const titleCell = row.insertCell(1);
+                        const bodyCell = row.insertCell(2);
+                        idCell.innerHTML = post.id;
+                        titleCell.innerHTML = post.title;
+                        bodyCell.innerHTML = post.body;
+                        tbody.appendChild(row);
+                        console.log(post);
+
                     });
+
                 })
                 .catch((error) => {
                     console.error(error);
@@ -154,7 +220,7 @@
                     reject("Error: " + xhr.statusText);
                 };
                 console.log(JSON.stringify({ [select]: newValue }));
-                
+
                 xhr.send(JSON.stringify({ [select]: newValue }));
             });
             miPromise
@@ -205,5 +271,6 @@
                 });
         }
     </script>
-  </body>
+</body>
+
 </html>
