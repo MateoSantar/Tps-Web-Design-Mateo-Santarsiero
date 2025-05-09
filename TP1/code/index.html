@@ -1,276 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TP N° 1</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 101vh;
-            background-color: #f0f0f0;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 101vh;
+        background-color: #f0f0f0;
+      }
 
-        .buttons-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+      .buttons-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
 
-        input,
-        select {
-            padding: 10px;
-            font-size: 16px;
-        }
+      input,
+      select {
+        padding: 10px;
+        font-size: 16px;
+      }
 
-        .hidden {
-            visibility: hidden;
-        }
+      .hidden {
+        visibility: hidden;
+      }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+      table {
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-        thead th {
-            background-color: #f2f2f2;
-            position: sticky;
-            /* Fija la cabecera en la parte superior */
-            top: 0;
-            /* Asegura que se pegue a la parte superior */
-            z-index: 1;
-            /* Evita que el contenido se superponga a la cabecera */
-        }
-        .tableDiv{
-            display: block;
-            overflow-y: scroll;
-            width: 100%;
-        }
-        tbody {
-            
-            width: 100%;
-            /* Agrega scroll vertical cuando el contenido excede la altura */
-        }
+      thead th {
+        background-color: #f2f2f2;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      .tableDiv {
+        display: block;
+        overflow-y: scroll;
+        width: 100%;
+      }
+      tbody {
+        width: 100%;
+        /* Agrega scroll vertical cuando el contenido excede la altura */
+      }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
     </style>
-</head>
-<!-- Hecho por Mateo Santarsiero 
+  </head>
+  <!-- Hecho por Mateo Santarsiero 
        API Utilizada: jsonplaceholder.typicode.com -->
 
-<body>
+  <body>
     <div class="buttons-container">
-        <div class="button-container">
-            <button onclick="getPosts()">Obtener listado de posts</button>
+      <div class="button-container">
+        <button onclick="getPosts()">Obtener listado de posts</button>
+      </div>
+      <div class="button-container">
+        <button onclick="postPost()">Cargar nuevo post</button>
+        <div class="inputs-container">
+          <input type="text" placeholder="Titulo" id="postTitle" />
+          <input type="text" placeholder="Cuerpo" id="postBody" />
         </div>
-        <div class="button-container">
-            <button onclick="postPost()">Cargar nuevo post</button>
-            <div class="inputs-container">
-                <input type="text" placeholder="Titulo" id="postTitle" />
-                <input type="text" placeholder="Cuerpo" id="postBody" />
-            </div>
-        </div>
-        <div class="button-container">
-            <button onclick="putPost()">Actualizar post</button>
-            <input type="text" placeholder="ID" id="putId" />
-            <select id="putSelect">
-                <option value="title">Titulo</option>
-                <option value="body">Cuerpo</option>
-            </select>
-            <input type="text" placeholder="Nuevo valor" id="putNewValue" />
-        </div>
-        <div class="button-container">
-            <button onclick="deletePost()">Dar de baja un post</button>
-            <input type="text" placeholder="ID" id="deleteId" />
-        </div>
+      </div>
+      <div class="button-container">
+        <button onclick="putPost()">Actualizar post</button>
+        <input type="text" placeholder="ID" id="putId" />
+        <select id="putSelect">
+          <option value="title">Titulo</option>
+          <option value="body">Cuerpo</option>
+        </select>
+        <input type="text" placeholder="Nuevo valor" id="putNewValue" />
+      </div>
+      <div class="button-container">
+        <button onclick="deletePost()">Dar de baja un post</button>
+        <input type="text" placeholder="ID" id="deleteId" />
+      </div>
     </div>
     <div class="tableDiv">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titulo</th>
-                    <th>Cuerpo</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-
-            </tbody>
-        </table>
-
+      <table class="hidden">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Titulo</th>
+            <th>Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
     <script>
-        const endpoint = 'https://jsonplaceholder.typicode.com/posts';
-        function getPosts() {
-            let miPromise = new Promise((resolve, reject) => {
-                let xhr = new XMLHttpRequest();
-                xhr.open("GET", endpoint);
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        reject("Error: " + xhr.statusText);
-                    }
-                };
-                xhr.onerror = () => {
-                    reject("Error: " + xhr.statusText);
-                };
-                xhr.send();
-            });
-
-            const tbody = document.getElementById('tableBody');
-            miPromise
-                .then((data) => {
-                    alert(`Exito! Posts obtenidos.`);
-                    data.forEach((post) => {
-                        const row = tbody.insertRow();
-                        const idCell = row.insertCell(0);
-                        const titleCell = row.insertCell(1);
-                        const bodyCell = row.insertCell(2);
-                        idCell.innerHTML = post.id;
-                        titleCell.innerHTML = post.title;
-                        bodyCell.innerHTML = post.body;
-                        tbody.appendChild(row);
-                        console.log(post);
-
-                    });
-
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert("Error al obtener los posts: " + error);
-                });
-        }
-
-        function postPost() {
-            let title = document.getElementById("postTitle").value;
-            let body = document.getElementById("postBody").value;
-            if (!title || !body) {
-                alert("Por favor, completa todos los campos.");
-                return;
+      const endpoint = "https://jsonplaceholder.typicode.com/posts";
+      function getPosts() {
+        let miPromise = new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("GET", endpoint);
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject("Error: " + xhr.statusText);
             }
-            let miPromise = new Promise((resolve, reject) => {
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", endpoint);
-                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        reject("Error: " + xhr.statusText);
-                    }
-                };
-                xhr.onerror = () => {
-                    reject("Error: " + xhr.statusText);
-                };
-                xhr.send(JSON.stringify({ title, body }));
-            });
-            miPromise
-                .then((data) => {
-                    alert('Post creado con éxito. Revisa la consola.');
-                    console.log(`ID: ${data.id}, Titulo: ${data.title}, Cuerpo: ${data.body}`);
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert("Error al crear el post: " + error);
-                });
-        }
+          };
+          xhr.onerror = () => {
+            reject("Error: " + xhr.statusText);
+          };
+          xhr.send();
+        });
 
-        function putPost() {
-            let id = document.getElementById("putId").value;
-            let select = document.getElementById("putSelect").value;
-            let newValue = document.getElementById("putNewValue").value;
-            if (!id || !newValue) {
-                alert("Por favor, completa todos los campos.");
-                return;
+        const tbody = document.getElementById("tableBody");
+        miPromise
+          .then((data) => {
+            alert(`Exito! Posts obtenidos.`);
+            document.querySelector("table").classList.remove("hidden");
+            data.forEach((post) => {
+              addRow(post);
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al obtener los posts: " + error);
+          });
+      }
+
+      function postPost() {
+        let title = document.getElementById("postTitle").value;
+        let body = document.getElementById("postBody").value;
+        if (!title || !body) {
+          alert("Por favor, completa todos los campos.");
+          return;
+        }
+        let miPromise = new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("POST", endpoint);
+          xhr.setRequestHeader(
+            "Content-Type",
+            "application/json;charset=UTF-8"
+          );
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject("Error: " + xhr.statusText);
             }
-            let miPromise = new Promise((resolve, reject) => {
-                let xhr = new XMLHttpRequest();
-                xhr.open("PUT", `${endpoint}/${id}`);
-                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        reject("Error: " + xhr.statusText);
-                    }
-                };
-                xhr.onerror = () => {
-                    reject("Error: " + xhr.statusText);
-                };
-                console.log(JSON.stringify({ [select]: newValue }));
+          };
+          xhr.onerror = () => {
+            reject("Error: " + xhr.statusText);
+          };
+          xhr.send(JSON.stringify({ title, body }));
+        });
+        miPromise
+          .then((data) => {
+            alert(`Post creado con éxito, ID = ${data.id}.`);
+            addRow(data);
+            document.querySelector("table").classList.remove("hidden");
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al crear el post: " + error);
+          });
+      }
 
-                xhr.send(JSON.stringify({ [select]: newValue }));
-            });
-            miPromise
-                .then((data) => {
-                    alert("Post actualizado con éxito. Revisa la consola.");
-                    if (select === "title") {
-                        console.log(`ID: ${data.id}, Titulo: ${data.title}`);
-                    } else if (select === "body") {
-                        console.log(`ID: ${data.id}, Cuerpo: ${data.body}`);
-
-                    }
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert("Error al actualizar el post: " + error);
-                });
+      function putPost() {
+        let id = document.getElementById("putId").value;
+        let select = document.getElementById("putSelect").value;
+        let newValue = document.getElementById("putNewValue").value;
+        if (!id || !newValue) {
+          alert("Por favor, completa todos los campos.");
+          return;
         }
-
-        function deletePost() {
-            let id = document.getElementById("deleteId").value;
-            if (!id) {
-                alert("Por favor, completa el campo ID.");
-                return;
+        let miPromise = new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("PUT", `${endpoint}/${id}`);
+          xhr.setRequestHeader(
+            "Content-Type",
+            "application/json;charset=UTF-8"
+          );
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject("Error: " + xhr.statusText);
             }
-            let miPromise = new Promise((resolve, reject) => {
-                let xhr = new XMLHttpRequest();
-                xhr.open("DELETE", `${endpoint}/${id}`);
-                xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        reject("Error: " + xhr.statusText);
-                    }
-                };
-                xhr.onerror = () => {
-                    reject("Error: " + xhr.statusText);
-                };
-                xhr.send();
-            });
-            miPromise
-                .then((data) => {
-                    alert("Post eliminado con éxito. Revisa la consola.");
-                    console.log(`ID: ${id} eliminado.`);
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert("Error al eliminar el post: " + error);
-                });
+          };
+          xhr.onerror = () => {
+            reject("Error: " + xhr.statusText);
+          };
+          console.log(JSON.stringify({ [select]: newValue }));
+
+          xhr.send(JSON.stringify({ [select]: newValue }));
+        });
+        miPromise
+          .then((data) => {
+            alert("Post actualizado con éxito.");
+            const tbody = document.getElementById("tableBody");
+            const rows = tbody.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              const idCell = row.cells[0];
+              if (idCell.innerHTML == id) {
+                idCell.innerHTML = data.id;
+                if (select == "title") {
+                  row.cells[1].innerHTML = newValue;
+                } else if (select == "body") {
+                  row.cells[2].innerHTML = newValue;
+                }
+                break;
+              }
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al actualizar el post: " + error);
+          });
+      }
+
+      function deletePost() {
+        let id = document.getElementById("deleteId").value;
+        if (!id) {
+          alert("Por favor, completa el campo ID.");
+          return;
         }
+        let miPromise = new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("DELETE", `${endpoint}/${id}`);
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject("Error: " + xhr.statusText);
+            }
+          };
+          xhr.onerror = () => {
+            reject("Error: " + xhr.statusText);
+          };
+          xhr.send();
+        });
+        miPromise
+          .then((data) => {
+            const tbody = document.getElementById("tableBody");
+            const rows = tbody.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              const idCell = row.cells[0];
+              if (idCell.innerHTML == id) {
+                alert("Post eliminado con éxito. ");
+                tbody.deleteRow(i);
+                break;
+              }
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al eliminar el post: " + error);
+          });
+      }
+
+      function addRow(data) {
+        const tbody = document.getElementById("tableBody");
+        const row = tbody.insertRow();
+        const idCell = row.insertCell(0);
+        const titleCell = row.insertCell(1);
+        const bodyCell = row.insertCell(2);
+        idCell.innerHTML = data.id;
+        titleCell.innerHTML = data.title;
+        bodyCell.innerHTML = data.body;
+        tbody.appendChild(row);
+      }
     </script>
-</body>
-
+  </body>
 </html>
