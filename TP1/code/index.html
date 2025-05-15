@@ -158,7 +158,7 @@
         const tbody = document.getElementById("tableBody");
         miPromise
           .then((data) => {
-            //alert(`Exito! Posts obtenidos.`);
+            alert(`Exito! Posts obtenidos.`);
             document.querySelector("table").classList.remove("hidden");
             data.forEach((post) => {
               addRow(post);
