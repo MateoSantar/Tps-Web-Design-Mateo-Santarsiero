@@ -10,14 +10,14 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 101vh;
+        height: 100vh;
         background-color: #f0f0f0;
       }
 
       .buttons-container {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
       }
 
       .button-container {
@@ -30,6 +30,13 @@
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
+        border-radius: 5px;
+        border: 1px solid black;
+        transition: background 0.2 ease-in-out;
+      }
+
+      button:hover{
+        background: #9c9b9b66;
       }
 
       input,
@@ -38,22 +45,24 @@
         font-size: 16px;
       }
 
-      .hidden {
-        visibility: hidden;
-      }
-
+      
       table {
         margin-top: 20px;
         width: 100%;
         border-collapse: collapse;
+        margin-bottom: 10px;
       }
-
+      
       thead th {
-        background-color: #f2f2f2;
-        position: sticky;
+        background-color: #edecec;
         top: 0;
         z-index: 1;
+        border: 1px solid #b9b8b8;
+        padding: 8px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        letter-spacing: 2px;
       }
+
       .tableDiv {
         display: block;
         overflow-y: scroll;
@@ -61,18 +70,31 @@
       }
       tbody {
         width: 100%;
-        /* Agrega scroll vertical cuando el contenido excede la altura */
       }
+      
 
-      th,
       td {
-        border: 1px solid #ddd;
+        border: 2px solid #ddd;
         padding: 8px;
         text-align: left;
       }
+      
+      tr:nth-child(even){background: #cccccc66;}
+      
+      tr:hover{
+        background: #bbbbbb81;
+      }
+
+      tr:nth-child(even):hover{
+        background: #9c9b9b66;
+      }
+      .hidden {
+        visibility: hidden;
+      }
+
     </style>
   </head>
-  <!-- Hecho por Mateo Santarsiero 
+  <!-- Made By Mateo Santarsiero 
        API Utilizada: jsonplaceholder.typicode.com -->
 
   <body>
@@ -101,8 +123,8 @@
         <input type="text" placeholder="ID" id="deleteId" />
       </div>
     </div>
-    <div class="tableDiv">
-      <table class="hidden">
+    <div id="tableDiv" class="tableDiv hidden">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -114,6 +136,7 @@
       </table>
     </div>
     <script>
+
       const endpoint = "https://jsonplaceholder.typicode.com/posts";
       function getPosts() {
         let miPromise = new Promise((resolve, reject) => {
@@ -135,11 +158,12 @@
         const tbody = document.getElementById("tableBody");
         miPromise
           .then((data) => {
-            alert(`Exito! Posts obtenidos.`);
+            //alert(`Exito! Posts obtenidos.`);
             document.querySelector("table").classList.remove("hidden");
             data.forEach((post) => {
               addRow(post);
             });
+            revealTable();
           })
           .catch((error) => {
             console.error(error);
@@ -177,7 +201,7 @@
           .then((data) => {
             alert(`Post creado con éxito, ID = ${data.id}.`);
             addRow(data);
-            document.querySelector("table").classList.remove("hidden");
+            revealTable();
           })
           .catch((error) => {
             console.error(error);
@@ -211,9 +235,9 @@
             reject("Error: " + xhr.statusText);
           };
           console.log(JSON.stringify({ [select]: newValue }));
-
           xhr.send(JSON.stringify({ [select]: newValue }));
         });
+
         miPromise
           .then((data) => {
             alert("Post actualizado con éxito.");
@@ -232,6 +256,7 @@
                 break;
               }
             }
+            revealTable();
           })
           .catch((error) => {
             console.error(error);
@@ -260,6 +285,7 @@
           };
           xhr.send();
         });
+        
         miPromise
           .then((data) => {
             const tbody = document.getElementById("tableBody");
@@ -290,6 +316,10 @@
         titleCell.innerHTML = data.title;
         bodyCell.innerHTML = data.body;
         tbody.appendChild(row);
+      }
+
+      function revealTable() {
+        document.getElementById('tableDiv').classList.remove('hidden');
       }
     </script>
   </body>
