@@ -18,21 +18,31 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        width: 100%;
       }
 
       .button-container {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        gap: 10px;
+      }
+      .inputs-container {
+        display: flex;
+        flex-direction: row;
         gap: 10px;
       }
 
       button {
-        padding: 10px 20px;
+        padding: 10px 15px;
         font-size: 16px;
         cursor: pointer;
         border-radius: 5px;
         border: 1px solid black;
-        transition: background 0.2 ease-in-out;
+        transition: background 0.2s ease-in-out;
+        background: #b9b8b8;
+        color: white;
+        letter-spacing: 2px;
+        width: 200px;;
       }
 
       button:hover{
@@ -43,6 +53,21 @@
       select {
         padding: 10px;
         font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid black;
+        width: 150px;
+        height: 20px;
+      }
+      select {
+        width: 172px;
+        height: 100%;
+      }
+
+      #postUserId::-webkit-outer-spin-button,
+      #postUserId::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        
       }
 
       
@@ -107,6 +132,7 @@
         <div class="inputs-container">
           <input type="text" placeholder="Titulo" id="postTitle" />
           <input type="text" placeholder="Cuerpo" id="postBody" />
+          <input type="number" placeholder="ID de usuario" id="postUserId" />
         </div>
       </div>
       <div class="button-container">
@@ -130,6 +156,7 @@
             <th>ID</th>
             <th>Titulo</th>
             <th>Cuerpo</th>
+            <th>User ID</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -174,6 +201,7 @@
       function postPost() {
         let title = document.getElementById("postTitle").value;
         let body = document.getElementById("postBody").value;
+        let userId = document.getElementById("postUserId").value;
         if (!title || !body) {
           alert("Por favor, completa todos los campos.");
           return;
@@ -195,7 +223,7 @@
           xhr.onerror = () => {
             reject("Error: " + xhr.statusText);
           };
-          xhr.send(JSON.stringify({ title, body }));
+          xhr.send(JSON.stringify({ title, body, userId }));
         });
         miPromise
           .then((data) => {
@@ -312,9 +340,11 @@
         const idCell = row.insertCell(0);
         const titleCell = row.insertCell(1);
         const bodyCell = row.insertCell(2);
+        const userIdCell = row.insertCell(3);
         idCell.innerHTML = data.id;
         titleCell.innerHTML = data.title;
         bodyCell.innerHTML = data.body;
+        userIdCell.innerHTML = data.userId;
         tbody.appendChild(row);
       }
 
