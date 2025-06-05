@@ -179,7 +179,24 @@
 
       const endpoint = "https://jsonplaceholder.typicode.com/posts";
       function getPosts() {
-        let miPromise = new Promise((resolve, reject) => {
+        let miPromise = getPromise();
+        const tbody = document.getElementById("tableBody");
+        miPromise
+          .then((data) => {
+            document.querySelector("table").classList.remove("hidden");
+            data.forEach((post) => {
+              addRow(post);
+            });
+            revealTable();
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al obtener los posts: " + error);
+          });
+      }
+
+      function getPromise() {
+        return new Promise((resolve, reject) => {
           let xhr = new XMLHttpRequest();
           xhr.open("GET", endpoint);
           xhr.onload = () => {
@@ -194,21 +211,6 @@
           };
           xhr.send();
         });
-
-        const tbody = document.getElementById("tableBody");
-        miPromise
-          .then((data) => {
-            alert(`Exito! Posts obtenidos.`);
-            document.querySelector("table").classList.remove("hidden");
-            data.forEach((post) => {
-              addRow(post);
-            });
-            revealTable();
-          })
-          .catch((error) => {
-            console.error(error);
-            alert("Error al obtener los posts: " + error);
-          });
       }
 
       function postPost() {
@@ -219,7 +221,21 @@
           alert("Por favor, completa todos los campos.");
           return;
         }
-        let miPromise = new Promise((resolve, reject) => {
+        let miPromise = postPromise();
+        miPromise
+          .then((data) => {
+            alert(`Post creado con éxito, ID = ${data.id}.`);
+            addRow(data);
+            revealTable();
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error al crear el post: " + error);
+          });
+      }
+
+      function postPromise() {
+        return new Promise((resolve, reject) => {
           let xhr = new XMLHttpRequest();
           xhr.open("POST", endpoint);
           xhr.setRequestHeader(
@@ -238,17 +254,8 @@
           };
           xhr.send(JSON.stringify({ title, body, userId }));
         });
-        miPromise
-          .then((data) => {
-            alert(`Post creado con éxito, ID = ${data.id}.`);
-            addRow(data);
-            revealTable();
-          })
-          .catch((error) => {
-            console.error(error);
-            alert("Error al crear el post: " + error);
-          });
       }
+      
 
       function putPost() {
         let id = document.getElementById("putId").value;
@@ -258,26 +265,7 @@
           alert("Por favor, completa todos los campos.");
           return;
         }
-        let miPromise = new Promise((resolve, reject) => {
-          let xhr = new XMLHttpRequest();
-          xhr.open("PUT", `${endpoint}/${id}`);
-          xhr.setRequestHeader(
-            "Content-Type",
-            "application/json;charset=UTF-8"
-          );
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve(JSON.parse(xhr.responseText));
-            } else {
-              reject("Error: " + xhr.statusText);
-            }
-          };
-          xhr.onerror = () => {
-            reject("Error: " + xhr.statusText);
-          };
-          console.log(JSON.stringify({ [select]: newValue }));
-          xhr.send(JSON.stringify({ [select]: newValue }));
-        });
+        let miPromise = putPromise();
 
         miPromise
           .then((data) => {
@@ -305,15 +293,14 @@
           });
       }
 
-      function deletePost() {
-        let id = document.getElementById("deleteId").value;
-        if (!id) {
-          alert("Por favor, completa el campo ID.");
-          return;
-        }
-        let miPromise = new Promise((resolve, reject) => {
+      function putPromise() {
+        return new Promise((resolve, reject) => {
           let xhr = new XMLHttpRequest();
-          xhr.open("DELETE", `${endpoint}/${id}`);
+          xhr.open("PUT", `${endpoint}/${id}`);
+          xhr.setRequestHeader(
+            "Content-Type",
+            "application/json;charset=UTF-8"
+          );
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               resolve(JSON.parse(xhr.responseText));
@@ -324,8 +311,18 @@
           xhr.onerror = () => {
             reject("Error: " + xhr.statusText);
           };
-          xhr.send();
+          console.log(JSON.stringify({ [select]: newValue }));
+          xhr.send(JSON.stringify({ [select]: newValue }));
         });
+      }
+
+      function deletePost() {
+        let id = document.getElementById("deleteId").value;
+        if (!id) {
+          alert("Por favor, completa el campo ID.");
+          return;
+        }
+        let miPromise = deletePromise();
         
         miPromise
           .then((data) => {
@@ -348,6 +345,24 @@
           });
       }
 
+      function deletePromise() {
+        return new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("DELETE", `${endpoint}/${id}`);
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject("Error: " + xhr.statusText);
+            }
+          };
+          xhr.onerror = () => {
+            reject("Error: " + xhr.statusText);
+          };
+          xhr.send();
+        });
+      }
+
       function addRow(data) {
         const tbody = document.getElementById("tableBody");
         const row = tbody.insertRow();
@@ -355,15 +370,22 @@
         const titleCell = row.insertCell(1);
         const bodyCell = row.insertCell(2);
         const userIdCell = row.insertCell(3);
+        const updateCell = row.insertCell(4);
+        const deleteCell = row.insertCell(5);
         idCell.innerHTML = data.id;
         titleCell.innerHTML = data.title;
         bodyCell.innerHTML = data.body;
         userIdCell.innerHTML = data.userId;
+        updateCell.innerHTML = `<button onclick="putPost(${data.id})">Update</button>`
         tbody.appendChild(row);
       }
 
       function revealTable() {
         document.getElementById('tableDiv').classList.remove('hidden');
+      }
+
+      window.onload = () => {
+        getPosts();
       }
     </script>
   </body>
